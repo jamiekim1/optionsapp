@@ -5,15 +5,38 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
-  tagList(
-    # Leave this function for adding external resources
+  shiny::fluidPage(
     golem_add_external_resources(),
-    # Your application UI logic
-    fluidPage(
-      h1("optionsapp")
+    # UI logic
+    titlePanel("Options "),
+    # top of page user input and app intro
+    # tabset structure
+    shiny::tabsetPanel(
+      type = "tabs",
+      shiny::tabPanel("How To Use This App"),
+      shiny::tabPanel("Options Strategy Builder"),
+      shiny::tabPanel("Options Risk Manager"),
+      shiny::tabPanel("Options Hedging")
     )
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #' Add external Resources to the Application
 #'
