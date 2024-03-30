@@ -6,4 +6,6 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
+  r <- reactiveValues()
+  mod_optionsData_server("optionsData_1", r = r)
 }

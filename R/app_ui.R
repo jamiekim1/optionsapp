@@ -7,14 +7,12 @@
 app_ui <- function(request) {
   shiny::fluidPage(
     golem_add_external_resources(),
-    # UI logic
-    titlePanel("Options "),
-    # top of page user input and app intro
-    # tabset structure
+    titlePanel("Options"),
     shiny::tabsetPanel(
       type = "tabs",
       shiny::tabPanel("How To Use This App"),
-      shiny::tabPanel("Options Strategy Builder"),
+      shiny::tabPanel("Options Strategy Builder",
+                      mod_optionsData_ui("optionsData_1")), # Inserting the UI module here
       shiny::tabPanel("Options Risk Manager"),
       shiny::tabPanel("Options Hedging")
     )
