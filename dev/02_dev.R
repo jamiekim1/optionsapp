@@ -32,6 +32,7 @@ usethis::use_package("tm")
 usethis::use_package("stringr")
 usethis::use_package("RColorBrewer")
 usethis::use_package("shinythemes")
+usethis::use_package("httr")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
