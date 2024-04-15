@@ -25,4 +25,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: dannyboy777257/fixedincomerisk:latest
+        tags: jamiekim1/optionsapp:latest
