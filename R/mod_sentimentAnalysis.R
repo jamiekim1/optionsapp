@@ -45,6 +45,7 @@ mod_sentimentAnalysis_server <- function(id, r){
         dplyr::mutate(sentiment = dplyr::if_else(positive > negative, "Positive", "Negative"))
     }
     
+    # Processes the text by removing stop words, punctuation, etc
     preprocess_text <- function(text) {
       text <- tolower(text)
       text <- stringr::str_remove_all(text, "[[:punct:]]")
@@ -65,6 +66,7 @@ mod_sentimentAnalysis_server <- function(id, r){
       
       req(input$ticker)
       
+      # Web scrapes news article summaries and performs sentiment analysis
       website1 <- paste0("https://www.bloomberg.com/search?query=", input$ticker)
       
       response1 <- httr::GET(website1, httr::add_headers(`User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"))
@@ -83,6 +85,7 @@ mod_sentimentAnalysis_server <- function(id, r){
         rvest::html_nodes(".abstract") %>%
         rvest::html_text()
       
+      # Notification for wrong input 
       if (length(summaries1) == 0 || length(summaries2) == 0) {
         shiny::showNotification("No data found for the ticker symbol provided", type = "message")
         return()
@@ -97,18 +100,20 @@ mod_sentimentAnalysis_server <- function(id, r){
         dplyr::select(-sentiment) %>%
         tidyr::pivot_longer(cols = everything(), names_to = "Sentiment", values_to = "Count")
       
+      # Recent sentiment pie chart
       output$recent_sentiment <- plotly::renderPlotly({
         
         plotly::plot_ly(r$sentiment_recent, labels = ~Sentiment, values = ~Count, type = 'pie', textinfo = 'percent',
-                        insidetextorientation = 'radial') %>% 
+                        insidetextorientation = 'radial', marker = list(colors = c('Positive' = 'red', 'Negative' = 'green'))) %>% 
           plotly::layout(title = "Recent Sentiment (Past Couple Months)")
         
       })
       
+      # Year sentiment pie chart
       output$year_sentiment <- plotly::renderPlotly({
         
         plotly::plot_ly(r$sentiment_year, labels = ~Sentiment, values = ~Count, type = 'pie', textinfo = 'percent',
-                        insidetextorientation = 'radial') %>% 
+                        insidetextorientation = 'radial', marker = list(colors = c('Positive' = 'red', 'Negative' = 'green'))) %>% 
           plotly::layout(title = " Sentiment Over the Past Year")
         
       })
@@ -171,7 +176,7 @@ mod_sentimentAnalysis_server <- function(id, r){
                              colors = RColorBrewer::brewer.pal(8, "Dark2"))
         
         # Add a title to the plot
-        title(main = "Yearly Word Cloud", cex.main = 2)  # Adjust title text size as needed
+        title(main = "Yearly Word Cloud", cex.main = 2)
       })
 
 

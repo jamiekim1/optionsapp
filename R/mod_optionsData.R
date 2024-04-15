@@ -33,7 +33,7 @@ mod_optionsData_ui <- function(id) {
                plotly::plotlyOutput(ns("vol_graph")))
   )
 }
-    
+
 #' optionsData Server Functions
 #'
 #' @noRd 
@@ -48,13 +48,14 @@ mod_optionsData_server <- function(id, r) {
                    
                    # Fetch options data based on user input, with error handling
                    r$optionChain <- tryCatch({
+                     # Get option chain data from quantmod package
                      quantmod::getOptionChain(input$ticker_symbol, Exp = input$expiration_date)
                    }, error = function(e) {
                      # Display the specific error message to the user
                      errorMsg <- e$message  # Extract the error message from the error object
                      shiny::showNotification(paste("Error fetching options data:", errorMsg),
                                              type = "error",
-                                             duration = 5)  # Duration in seconds, adjust as needed
+                                             duration = 5)  # Duration in seconds
                      return(NULL)  # Return NULL to avoid further processing with a non-existent `optionChain`
                    })
                    
@@ -89,6 +90,7 @@ mod_optionsData_server <- function(id, r) {
                    
                    # Fetch historical stock price data
                    stockData <- tryCatch({
+                     # Get stock price data using tidyquant package
                      tidyquant::tq_get(input$ticker_symbol,
                                        get = "stock.prices",
                                        from = Sys.Date() - (365 * 5),
@@ -108,7 +110,7 @@ mod_optionsData_server <- function(id, r) {
                    
                    output$stock_graph <- plotly::renderPlotly({
                      p1 <- plotly::plot_ly(data = stockData, x = ~date, y = ~adjusted,
-                                          type = 'scatter', mode = 'lines') %>%
+                                           type = 'scatter', mode = 'lines') %>%
                        plotly::layout(title = paste("5 Year Stock Price for", toupper(input$ticker_symbol)),
                                       xaxis = list(title = "Date"),
                                       yaxis = list(title = "Adjusted Close Price"))
@@ -122,9 +124,9 @@ mod_optionsData_server <- function(id, r) {
                                      shareX = TRUE) %>% 
                        plotly::layout(showlegend = FALSE)
                    })
-                 
-                 
-    })
+                   
+                   
+                 })
                  observeEvent(input$generate_btn, {
                    
                    r$df_filtered <- reactive({
@@ -136,13 +138,13 @@ mod_optionsData_server <- function(id, r) {
                    output$bidask_graph <- plotly::renderPlotly({
                      req(r$df_filtered())
                      plotly::plot_ly(data = r$df_filtered(),
-                                                  x = ~Strike,
-                                                  y = ~Spread,
-                                                  type = 'scatter',
-                                                  mode = 'lines') %>% 
-                     plotly::layout(title = 'Bid-Ask Spread Over Multiple Strikes',
-                                    xaxis = list(title = 'Strike'),
-                                    yaxis = list(title = 'Bid-Ask Spread (%)'))
+                                     x = ~Strike,
+                                     y = ~Spread,
+                                     type = 'scatter',
+                                     mode = 'lines') %>% 
+                       plotly::layout(title = 'Bid-Ask Spread Over Multiple Strikes',
+                                      xaxis = list(title = 'Strike'),
+                                      yaxis = list(title = 'Bid-Ask Spread (%)'))
                    })
                    
                    
@@ -158,7 +160,7 @@ mod_optionsData_server <- function(id, r) {
                    })
                    
                  })
-  })
+               })
 }
 
 

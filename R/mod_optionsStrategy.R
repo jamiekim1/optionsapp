@@ -12,43 +12,43 @@ mod_optionsStrategy_ui <- function(id) {
   tagList(
     shiny::div(class = "center-container",  # Apply centering class
                shiny::textInput(ns("ticker"), "Stock Ticker Symbol", placeholder = "Enter the stock ticker"),
-               shiny::textOutput(ns("current_price_display"))
+               shiny::textOutput(ns("current_price_display"))  # Display the current stock price
     ),
     shiny::div(class = "center-container",  # Center the table
-               DT::DTOutput(ns("contracts_table"))
+               DT::DTOutput(ns("contracts_table"))  # Output for options contracts table
     ),
     shiny::div(class = "button-container",  # Center and space buttons
-               shiny::actionButton(ns("add_row"), "Add Contract"),
-               shiny::actionButton(ns("remove_row"), "Remove Selected Contract(s)"),
-               shiny::actionButton(ns("calculate_payoff"), "Calculate Payoff")
+               shiny::actionButton(ns("add_row"), "Add Contract"),  # Button to add a new contract row
+               shiny::actionButton(ns("remove_row"), "Remove Selected Contract(s)"),  # Button to remove selected rows
+               shiny::actionButton(ns("calculate_payoff"), "Calculate Payoff")  # Button to calculate and display payoff graph
     ),
     shiny::div(class = "center-container large-graph-container",  # Center the plot output
-               plotly::plotlyOutput(ns("payoff_graph"))
+               plotly::plotlyOutput(ns("payoff_graph"))  # Output for displaying the payoff graph
     )
   )
 }
-    
+
 #' optionsStrategy Server Functions
 #'
 #' @noRd 
-#' 
 mod_optionsStrategy_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # Reactive function to fetch current stock price
     current_price <- reactive({
-      req(input$ticker)
+      req(input$ticker)  # Require ticker symbol input before fetching
       
       tryCatch({
-        tidyquant::tq_get(input$ticker,
+        tidyquant::tq_get(input$ticker,  # Fetch stock prices for the last 5 days
                           get = "stock.prices",
                           from = Sys.Date() - 5,
                           to = Sys.Date()) %>% 
-          dplyr::filter(date == max(date)) %>% 
+          dplyr::filter(date == max(date)) %>%  # Get the latest available price
           dplyr::pull(adjusted)
         
       }, error = function(e) {
-        errorMsg <- e$message
+        errorMsg <- e$message  # Handle any errors in fetching data
         shiny::showNotification(paste("Error fetching options data:", errorMsg),
                                 type = "error",
                                 duration = 5)
@@ -56,19 +56,19 @@ mod_optionsStrategy_server <- function(id, r) {
       })
     })
     
+    # Render the current price to the UI
     output$current_price_display <- renderText({
       cp <- current_price()
       req(cp)
-      paste("Current Price:", format(cp, nsmall = 2))
+      paste("Current Price:", format(cp, nsmall = 2))  # Format and display current price
     })
     
+    # Initialize and manage the contracts data
     r$contracts_data <- reactiveVal(data.frame(
       Position = c("LC"),
       `Strike Price` = c(100),
       `Option Premium` = c(1)
     ))
-    
-
     
     # Render the DT table with row selection enabled
     output$contracts_table <- DT::renderDT({
@@ -94,6 +94,7 @@ mod_optionsStrategy_server <- function(id, r) {
       }
     })
     
+    # Observe cell edits and update the contracts data accordingly
     shiny::observeEvent(input$contracts_table_cell_edit, {
       info <- input$contracts_table_cell_edit
       req(info) 
@@ -101,6 +102,7 @@ mod_optionsStrategy_server <- function(id, r) {
       r$contracts_data(updated_data) 
     })
     
+    # Create a function to generate payoff graph data
     create_options_strategy_payoff_graph <- function(contracts, stock_price_range) {
       # Expand the data frame to include each stock price for each contract
       expanded_data <- tidyr::expand_grid(
@@ -119,13 +121,13 @@ mod_optionsStrategy_server <- function(id, r) {
           Position == "SP" ~ -pmax(Strike.Price - stock_price, 0) + Option.Premium
         ))
       
-      
       # Aggregate payoff by stock price
       r$strategy_payoff <- expanded_data %>%
         dplyr::group_by(stock_price) %>%
         dplyr::summarize(total_payoff = sum(payoff), .groups = 'drop')
     }
     
+    # Observe calculate_payoff button clicks to generate and render the payoff graph
     observeEvent(input$calculate_payoff, {
       req(r$contracts_data())
       cp <- req(current_price())  # Ensure current price is available

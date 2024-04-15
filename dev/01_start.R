@@ -20,12 +20,12 @@
 ##
 golem::fill_desc(
   pkg_name = "optionsapp", # The Name of the package containing the App
-  pkg_title = "PKG_TITLE", # The Title of the package containing the App
-  pkg_description = "Everything a user needs or Options Contracts", # The Description of the package containing the App
+  pkg_title = "TradeWise", # The Title of the package containing the App
+  pkg_description = "An options app that allows users to view options contracts, build strategies, analyze sentiment, and monitor greeks.", # The Description of the package containing the App
   author_first_name = "Jamie", # Your First Name
   author_last_name = "Kim", # Your Last Name
   author_email = "jamiek101699@gmail.com", # Your Email
-  repo_url = NULL, # The URL of the GitHub Repo (optional),
+  repo_url = "https://github.com/jamiekim1/optionsapp", # The URL of the GitHub Repo (optional),
   pkg_version = "0.0.0.9000" # The Version of the package containing the App
 )
 
