@@ -19,6 +19,7 @@ Imports:
     plotly,
     quantmod,
     RColorBrewer,
+    roptions,
     rvest,
     shiny (>= 1.8.0),
     shinythemes,
