@@ -67,7 +67,8 @@ mod_sentimentAnalysis_server <- function(id, r){
       
       website1 <- paste0("https://www.bloomberg.com/search?query=", input$ticker)
       
-      page1 <- rvest::read_html(website1)
+      response1 <- httr::GET(website1, httr::add_headers(`User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"))
+      page1 <- rvest::read_html(httr::content(response1, type = "text"))
       
       summaries1 <- page1 %>%
         rvest::html_nodes(".summary__a759320e4a") %>%
@@ -75,7 +76,8 @@ mod_sentimentAnalysis_server <- function(id, r){
       
       website2 <- paste0("https://www.insidertracking.com/company-news?ticker=", input$ticker)
       
-      page2 <- rvest::read_html(website2)
+      response2 <- httr::GET(website2, httr::add_headers(`User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"))
+      page2 <- rvest::read_html(httr::content(response2, type = "text"))
       
       summaries2 <- page2 %>% 
         rvest::html_nodes(".abstract") %>%
