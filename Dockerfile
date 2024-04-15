@@ -12,6 +12,8 @@ RUN git clone https://github.com/jamiekim1/optionsapp.git /srv/shiny-server/opti
 
 RUN R -e "install.packages('remotes')"
 
+RUN R -e "install.packages('roptions', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+
 
 RUN R -e "remotes::install_deps('/srv/shiny-server/optionsapp')"
 
