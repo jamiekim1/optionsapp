@@ -1,0 +1,29 @@
+#recent_wordcloud, #year_wordcloud {
+  height: 100%;
+  width: 100%;
+}
+
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+}
+
+.tab-content {
+    text-align: center;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.large-graph-container {
+    height: 800px;
+}
+
+.title-panel h2 {
+    text-align: center;
+    font-weight: bold;
+}

@@ -5,16 +5,29 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
-  shiny::fluidPage(
-    golem_add_external_resources(),
-    titlePanel("Options"),
-    shiny::tabsetPanel(
-      type = "tabs",
-      shiny::tabPanel("How To Use This App"),
-      shiny::tabPanel("Options Strategy Builder",
-                      mod_optionsData_ui("optionsData_1")), # Inserting the UI module here
-      shiny::tabPanel("Options Risk Manager"),
-      shiny::tabPanel("Options Hedging")
+  tagList(
+    tags$head(
+      tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+    ),
+    shiny::fluidPage(
+      theme = shinythemes::shinytheme("lumen"),
+      golem_add_external_resources(),
+      shiny::div(class="title-panel", 
+                 titlePanel("TradeWise: Options")
+      ),
+      shiny::tabsetPanel(
+        type = "tabs",
+        shiny::tabPanel("User Guide",
+                        mod_userGuide_ui("userGuide_1")),
+        shiny::tabPanel("Options Chain",
+                        mod_optionsData_ui("optionsData_1")),
+        shiny::tabPanel("Strategy Builder",
+                        mod_optionsStrategy_ui("optionsStrategy_1")),
+        shiny::tabPanel("Greeks",
+                        mod_greeksData_ui("greeksData_1")),
+        shiny::tabPanel("Sentiment Analysis",
+                        mod_sentimentAnalysis_ui("sentimentAnalysis_1"))
+      )
     )
   )
 }

@@ -16,12 +16,30 @@
 ## Dependencies ----
 ## Amend DESCRIPTION with dependencies read from package code parsing
 ## install.packages('attachment') # if needed.
-attachment::att_amend_desc()
+attachment::att_from_rscripts()
+usethis::use_package("dplyr")
+usethis::use_package("tidyr")
+usethis::use_package("plotly")
+usethis::use_pipe()
+usethis::use_package("DT")
+usethis::use_package("quantmod")
+usethis::use_package("tidyquant")
+usethis::use_package("lubridate")
+usethis::use_package("tidytext")
+usethis::use_package("rvest")
+usethis::use_package("wordcloud")
+usethis::use_package("tm")
+usethis::use_package("stringr")
+usethis::use_package("RColorBrewer")
+usethis::use_package("shinythemes")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module(name = "optionsData") # Name of the module
-golem::add_module(name = "name_of_module2") # Name of the module
+golem::add_module(name = "userGuide")
+golem::add_module(name = "optionsData") 
+golem::add_module(name = "optionsStrategy")
+golem::add_module(name = "greeksData")
+golem::add_module(name = "sentimentAnalysis")
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
