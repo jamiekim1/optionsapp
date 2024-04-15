@@ -114,7 +114,7 @@ mod_sentimentAnalysis_server <- function(id, r){
         
         plotly::plot_ly(r$sentiment_year, labels = ~Sentiment, values = ~Count, type = 'pie', textinfo = 'percent',
                         insidetextorientation = 'radial', marker = list(colors = c('Positive' = 'red', 'Negative' = 'green'))) %>% 
-          plotly::layout(title = " Sentiment Over the Past Year")
+          plotly::layout(title = "Sentiment Over the Past Year")
         
       })
 
