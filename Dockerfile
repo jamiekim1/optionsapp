@@ -22,4 +22,5 @@ RUN R -e "remotes::install_local('/srv/shiny-server/optionsapp')"
 EXPOSE 3939
 
 
-CMD ["R", "-e", "optionsapp::run_app()"]
+CMD ["R", "-e", "optionsapp::run_app(host = '0.0.0.0', port = 3939)"]
+
