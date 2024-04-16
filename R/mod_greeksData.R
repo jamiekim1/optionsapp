@@ -53,24 +53,24 @@ mod_greeksData_server <- function(id, r){
       req(input$ticker_symbol, input$expiration, input$strike, input$position, input$greek, input$volatility, input$rate)
       
       # Initialize current_price
-      current_price <- NULL
-      
-      # Attempt to fetch the current price and handle possible errors
-      tryCatch({
+      current_price <- tryCatch({
+        # Fetch stock data
         stock_data <- tidyquant::tq_get(input$ticker_symbol,
                                         get = "stock.prices",
                                         from = Sys.Date() - 5,
                                         to = Sys.Date())
+        # Check if the fetched data frame is empty
         if (nrow(stock_data) == 0) {
           shiny::showNotification("No data returned for the ticker symbol. Please input a valid ticker.", type = "error", duration = 5)
-          return()  
+          return(NULL)  # Return NULL to indicate failure
         }
-        current_price <- stock_data %>%
-          dplyr::filter(date == max(date)) %>%
+        # Extract the latest price
+        latest_price <- dplyr::filter(stock_data, date == max(date)) %>%
           dplyr::pull(adjusted)
+        latest_price  # Return the fetched price
       }, error = function(e) {
         shiny::showNotification(paste("Error fetching data for ticker symbol:", input$ticker_symbol, ". Error message:", e$message), type = "error", duration = 5)
-        return()
+        return(NULL)  # Return NULL on error
       })
       
       req(current_price)  # Ensure current_price is successfully fetched before proceeding
