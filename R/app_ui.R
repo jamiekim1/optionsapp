@@ -13,7 +13,7 @@ app_ui <- function(request) {
       theme = shinythemes::shinytheme("sandstone"),
       golem_add_external_resources(),
       shiny::div(class="title-panel", 
-                 titlePanel("TradeWise: Options")
+                 titlePanel("TradeWise: Option")
       ),
       shiny::tabsetPanel(
         type = "tabs",
