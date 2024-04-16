@@ -52,15 +52,35 @@ mod_greeksData_server <- function(id, r){
       req(input$ticker_symbol, input$expiration, input$strike, input$position, input$greek,
           input$volatility, input$rate)
       
-      current_price <- tidyquant::tq_get(input$ticker_symbol,
-                            get = "stock.prices",
-                            from = Sys.Date() - 5,
-                            to = Sys.Date()) %>% 
-            dplyr::filter(date == max(date)) %>% 
+      current_price <- reactive({
+        req(input$ticker_symbol)  # Ensure that the ticker symbol input is not empty
+        
+        tryCatch({
+          stock_data <- tidyquant::tq_get(input$ticker_symbol,
+                                          get = "stock.prices",
+                                          from = Sys.Date() - 5,
+                                          to = Sys.Date())
+          if (nrow(stock_data) == 0) {  # Check if the data frame is empty
+            shiny::showNotification("No data returned for the ticker symbol. Please input a valid ticker.", type = "error", duration = 5)
+            return(NULL)  # Return NULL to signal an error occurred
+          }
+          # Extract the latest price
+          latest_price <- stock_data %>%
+            dplyr::filter(date == max(date)) %>%
             dplyr::pull(adjusted)
+          return(latest_price)
+        }, error = function(e) {
+          # Display a notification on any error, including HTTP 404
+          shiny::showNotification(paste("Error fetching data for ticker symbol:", input$ticker_symbol, ". Error message:", e$message), type = "error", duration = 5)
+          return(NULL)  # Return NULL to stop further execution
+        })
+      })
+      
+      cp <- current_price()
+      req(cp)
       
       output$current_price_display <- renderText({
-        cp <- current_price
+        cp <- current_price()
         req(cp)
         paste("Current Price:", format(cp, nsmall = 2))
       })
@@ -68,9 +88,9 @@ mod_greeksData_server <- function(id, r){
       ttm <- (lubridate::yday(input$expiration) - lubridate::yday(Sys.Date())) / 365
       
       range_factor <- if (input$greek == "delta") {
-        seq(0.8 * current_price, 1.2 * current_price, by = 0.01 * current_price)
+        seq(0.8 * cp, 1.2 * cp, by = 0.01 * cp)
       } else if (input$greek == "gamma") {
-        seq(0.8 * current_price, 1.2 * current_price, by = 0.01 * current_price)
+        seq(0.8 * cp, 1.2 * cp, by = 0.01 * cp)
       } else if (input$greek == "theta") {
         seq(from = ttm, to = 0, by = -(1 / 365))
       } else if (input$greek == "vega") {
@@ -111,7 +131,7 @@ mod_greeksData_server <- function(id, r){
             } else if(input$greek == "theta") {
             
             roptions::call.greek(input$greek,
-                                 current_price,
+                                 cp,
                                  input$strike,
                                  modified_input,
                                  input$volatility,
@@ -121,7 +141,7 @@ mod_greeksData_server <- function(id, r){
             } else if (input$greek == "vega") {
               
               roptions::call.greek(input$greek,
-                                   current_price,
+                                   cp,
                                    input$strike,
                                    ttm,
                                    modified_input,
@@ -131,7 +151,7 @@ mod_greeksData_server <- function(id, r){
             } else {
               
               roptions::call.greek(input$greek,
-                                   current_price,
+                                   cp,
                                    input$strike,
                                    ttm,
                                    input$volatility,
@@ -164,7 +184,7 @@ mod_greeksData_server <- function(id, r){
           } else if(input$greek == "theta") {
             
             roptions::call.greek(input$greek,
-                                 current_price,
+                                 cp,
                                  input$strike,
                                  modified_input,
                                  input$volatility,
@@ -174,7 +194,7 @@ mod_greeksData_server <- function(id, r){
           } else if (input$greek == "vega") {
             
             roptions::call.greek(input$greek,
-                                 current_price,
+                                 cp,
                                  input$strike,
                                  ttm,
                                  modified_input,
@@ -184,7 +204,7 @@ mod_greeksData_server <- function(id, r){
           } else {
             
             roptions::call.greek(input$greek,
-                                 current_price,
+                                 cp,
                                  input$strike,
                                  ttm,
                                  input$volatility,

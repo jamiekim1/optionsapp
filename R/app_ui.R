@@ -10,7 +10,7 @@ app_ui <- function(request) {
       tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
     ),
     shiny::fluidPage(
-      theme = shinythemes::shinytheme("lumen"),
+      theme = shinythemes::shinytheme("sandstone"),
       golem_add_external_resources(),
       shiny::div(class="title-panel", 
                  titlePanel("TradeWise: Options")
