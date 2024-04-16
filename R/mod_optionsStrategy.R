@@ -99,7 +99,15 @@ mod_optionsStrategy_server <- function(id, r) {
       info <- input$contracts_table_cell_edit
       req(info) 
       updated_data <- DT::editData(r$contracts_data(), info, rownames = FALSE)
-      r$contracts_data(updated_data) 
+      if (!all(updated_data$Position %in% c("LC", "SC", "LP", "SP"))) {
+        shiny::showNotification("Invalid entry in Position column. Please enter only LC, SC, LP, or SP.",
+                                type = "error",
+                                duration = 5)
+        return()
+      }
+      
+      # If validation passes, update the reactive value with the new data
+      r$contracts_data(updated_data)
     })
     
     # Create a function to generate payoff graph data

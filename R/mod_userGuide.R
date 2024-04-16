@@ -68,7 +68,7 @@ mod_userGuide_server <- function(id, r){
               shiny::p("5. Once your strategy is set, click 'Calculate Payoff' to generate a graph displaying the potential financial outcomes across a range of stock prices at expiration."),
               shiny::p("6. Analyze the 'Payoff Graph at Expiration' to understand how the options strategy might perform under various stock price scenarios. This visualization helps in assessing the effectiveness and risk associated with the strategy."),
               shiny::h4(strong("Disclaimers")),
-              shiny::p("Position input is case sensitive and should be LC, SC, LP, or LC.")
+              shiny::p("Position input is case sensitive and should be LC (Long-Call), SC (Short-Call), LP (Long-Put), or SP (Short-Put.")
             )
           )
         } else if(input$guideSelection == "Greeks") {
