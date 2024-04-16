@@ -44,46 +44,43 @@ mod_greeksData_ui <- function(id){
 #'
 #' @noRd 
 mod_greeksData_server <- function(id, r){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
     
+    # Observe the Calculate button
     shiny::observeEvent(input$calculate_btn, {
-      # Ensure all inputs are available before proceeding
-      req(input$ticker_symbol, input$expiration, input$strike, input$position, input$greek,
-          input$volatility, input$rate)
+      # Check all necessary inputs
+      req(input$ticker_symbol, input$expiration, input$strike, input$position, input$greek, input$volatility, input$rate)
       
-      current_price <- reactive({
-        req(input$ticker_symbol)  # Ensure that the ticker symbol input is not empty
-        
-        tryCatch({
-          stock_data <- tidyquant::tq_get(input$ticker_symbol,
-                                          get = "stock.prices",
-                                          from = Sys.Date() - 5,
-                                          to = Sys.Date())
-          if (nrow(stock_data) == 0) {  # Check if the data frame is empty
-            shiny::showNotification("No data returned for the ticker symbol. Please input a valid ticker.", type = "error", duration = 5)
-            return(NULL)  # Return NULL to signal an error occurred
-          }
-          # Extract the latest price
-          latest_price <- stock_data %>%
-            dplyr::filter(date == max(date)) %>%
-            dplyr::pull(adjusted)
-          return(latest_price)
-        }, error = function(e) {
-          # Display a notification on any error, including HTTP 404
-          shiny::showNotification(paste("Error fetching data for ticker symbol:", input$ticker_symbol, ". Error message:", e$message), type = "error", duration = 5)
-          return(NULL)  # Return NULL to stop further execution
-        })
+      # Initialize current_price
+      current_price <- NULL
+      
+      # Attempt to fetch the current price and handle possible errors
+      tryCatch({
+        stock_data <- tidyquant::tq_get(input$ticker_symbol,
+                                        get = "stock.prices",
+                                        from = Sys.Date() - 5,
+                                        to = Sys.Date())
+        if (nrow(stock_data) == 0) {
+          shiny::showNotification("No data returned for the ticker symbol. Please input a valid ticker.", type = "error", duration = 5)
+          return()  
+        }
+        current_price <- stock_data %>%
+          dplyr::filter(date == max(date)) %>%
+          dplyr::pull(adjusted)
+      }, error = function(e) {
+        shiny::showNotification(paste("Error fetching data for ticker symbol:", input$ticker_symbol, ". Error message:", e$message), type = "error", duration = 5)
+        return()
       })
       
-      cp <- current_price()
-      req(cp)
+      req(current_price)  # Ensure current_price is successfully fetched before proceeding
       
       output$current_price_display <- renderText({
-        cp <- current_price()
-        req(cp)
-        paste("Current Price:", format(cp, nsmall = 2))
+        paste("Current Price:", format(current_price, nsmall = 2))
       })
+      
+      cp <- current_price
+      req(cp)
       
       ttm <- (lubridate::yday(input$expiration) - lubridate::yday(Sys.Date())) / 365
       
